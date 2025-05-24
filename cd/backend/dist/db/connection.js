@@ -1,11 +1,11 @@
-import { connect, disconnect } from 'mongoose';
+import { connect, disconnect } from "mongoose";
 async function connectToDatabase() {
     try {
-        connect(process.env.MONGODB_URL);
+        await connect(process.env.MONGODB_URL);
     }
     catch (error) {
         console.log(error);
-        throw new Error('Failed to connect to database');
+        throw new Error("Could not Connect To MongoDB");
     }
 }
 async function disconnectFromDatabase() {
@@ -14,9 +14,8 @@ async function disconnectFromDatabase() {
     }
     catch (error) {
         console.log(error);
-        throw new Error('Failed to disconnect from database');
+        throw new Error("Could not Disconnect From MongoDB");
     }
 }
 export { connectToDatabase, disconnectFromDatabase };
-// import { connectToDatabase, disconnectFromDatabase } from './db/connection';
 //# sourceMappingURL=connection.js.map
