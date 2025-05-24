@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
 import TypingAnim from "../components/typer/TypingAnim";
 import Footer from "../components/footer/Footer";
@@ -20,6 +20,22 @@ const Home = () => {
       >
         <Box>
           <TypingAnim />
+        </Box>
+        {/* Login and Signup Buttons */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            my: 4,
+            justifyContent: "center",
+          }}
+        >
+          <Button variant="contained" color="primary">
+            Login
+          </Button>
+          <Button variant="outlined" color="primary">
+            Signup
+          </Button>
         </Box>
         <Box
           sx={{
@@ -59,7 +75,6 @@ const Home = () => {
           />
         </Box>
       </Box>
-
     </Box>
   );
 };
