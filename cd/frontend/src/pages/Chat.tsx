@@ -1,7 +1,8 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Avatar, Typography, Button, IconButton } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { useAuth } from "../context/AuthContext";
+import { useChat } from "../context/ChatContext";
 import ChatItem from "../components/chat/ChatItem";
 import { IoMdSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -11,56 +12,56 @@ import {
   sendChatRequest,
 } from "../helpers/api-communicator";
 import toast from "react-hot-toast";
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+
 const Chat = () => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const auth = useAuth();
-  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const { messages, setMessages, loading } = useChat();
+
   const handleSubmit = async () => {
     const content = inputRef.current?.value as string;
     if (inputRef && inputRef.current) {
       inputRef.current.value = "";
     }
-    const newMessage: Message = { role: "user", content };
-    setChatMessages((prev) => [...prev, newMessage]);
-    const chatData = await sendChatRequest(content);
-    setChatMessages([...chatData.chats]);
-    //
+    const newMessage = { role: "user" as const, content };
+    setMessages([...messages, newMessage]);
+    
+    try {
+      const chatData = await sendChatRequest(content);
+      setMessages([...chatData.chats]);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message");
+    }
   };
+
   const handleDeleteChats = async () => {
     try {
       toast.loading("Deleting Chats", { id: "deletechats" });
       await deleteUserChats();
-      setChatMessages([]);
+      setMessages([]);
       toast.success("Deleted Chats Successfully", { id: "deletechats" });
     } catch (error) {
       console.log(error);
       toast.error("Deleting chats failed", { id: "deletechats" });
     }
   };
-  useLayoutEffect(() => {
-    if (auth?.isLoogedIn && auth.user) {
-      toast.loading("Loading Chats", { id: "loadchats" });
-      getUserChats()
-        .then((data) => {
-          setChatMessages([...data.chats]);
-          toast.success("Successfully loaded chats", { id: "loadchats" });
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Loading Failed", { id: "loadchats" });
-        });
-    }
-  }, [auth]);
+
   useEffect(() => {
     if (!auth?.user) {
       navigate("/login");
     }
-  }, [auth]);
+  }, [auth, navigate]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Typography>Loading chats...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -145,7 +146,7 @@ const Chat = () => {
             fontWeight: "600",
           }}
         >
-          Model - GPT 3.5 Turbo
+          Model - Gemini 1.5 Flash
         </Typography>
         <Box
           sx={{
@@ -161,8 +162,7 @@ const Chat = () => {
             scrollBehavior: "smooth",
           }}
         >
-          {chatMessages.map((chat, index) => (
-            //@ts-ignore
+          {messages.map((chat, index) => (
             <ChatItem content={chat.content} role={chat.role} key={index} />
           ))}
         </Box>
@@ -175,7 +175,6 @@ const Chat = () => {
             margin: "auto",
           }}
         >
-          {" "}
           <input
             ref={inputRef}
             type="text"

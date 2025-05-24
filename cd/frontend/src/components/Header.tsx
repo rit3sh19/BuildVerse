@@ -13,12 +13,24 @@ const Header = () => {
       <Toolbar sx={{ display: "flex" }}>
         
         <div>
-          {auth?.isLoogedIn ? (
+          {auth?.isLoggedIn ? (
             <>
               <NavigationLink
                 bg="#00fffc"
                 to="/chat"
                 text="Go To Chat"
+                textColor="black"
+              />
+              <NavigationLink
+                bg="#51538f"
+                to="/mood"
+                text="Mood Tracker"
+                textColor="white"
+              />
+              <NavigationLink
+                bg="#00fffc"
+                to="/journal"
+                text="Journal"
                 textColor="black"
               />
               <NavigationLink
